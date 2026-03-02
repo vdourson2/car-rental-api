@@ -2,6 +2,10 @@
 
 Backend project linked to "IA for developpers" training from Technofutur tic
 
+## GPT chat used to generate the requirements.md and user_stories.md files
+
+<https://chatgpt.com/share/69a5af2d-3dd8-800b-8a0a-3834d6343c52>
+
 ## Setup
 
 1. Create a virtual environment:
