@@ -2,14 +2,15 @@
 
 ```mermaid
 erDiagram
-    VEHICULE {
-        int id_vehicule
-        string marque
-        string modele
-        string immatriculation
-        float prix_par_jour
-        string statut
-    }
+
+VEHICULE {
+    int id_vehicule
+    string marque
+    string modele
+    string immatriculation
+    float prix_par_jour
+    string statut
+}
 
     CLIENT {
         int id_client
@@ -34,3 +35,4 @@ erDiagram
     CLIENT ||--o{ LOCATION : "effectue"
     VEHICULE ||--o{ LOCATION : "concerne"
     UTILISATEUR ||--o{ LOCATION : "cree"
+```

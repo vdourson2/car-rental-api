@@ -1,0 +1,90 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: car-rental-postgres
+    environment:
+      POSTGRES_DB: car_rental
+      POSTGRES_USER: car_rental
+      POSTGRES_PASSWORD: car_rental
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build:
+      context: .
+    container_name: car-rental-backend
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://car_rental:car_rental@postgres:5432/car_rental
+    depends_on:
+      - postgres
+    command: flask --app app:create_app run --host=0.0.0.0 --reload
+
+  frontend:
+    build:
+      context: ../CarRentalUI
+    container_name: car-rental-frontend
+    volumes:
+      - ../CarRentalUI:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    command: npm start -- --host 0.0.0.0 --poll=2000
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    container_name: car-rental-swagger
+    ports:
+      - "8080:8080"
+    environment:
+      SWAGGER_JSON_URL: http://localhost:5000/openapi.json
+    depends_on:
+      - backend
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: car-rental-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: car_rental
+      DB_POSTGRESDB_PASSWORD: car_rental
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      NODE_ENV: development
+    depends_on:
+      - postgres
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: car-rental-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  n8n_data:
+  pgadmin_data:
