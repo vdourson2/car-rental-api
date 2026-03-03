@@ -15,4 +15,5 @@ $response = Invoke-RestMethod `
     -ContentType "application/json"
 
 # Affichage de la réponse
-$response
+$response.response | Out-File -FilePath ".\gemini-output.txt" -Encoding utf8
+Write-Host "✅ Réponse écrite dans gemini-output.txt"

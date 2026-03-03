@@ -10,9 +10,9 @@ api_bp = Blueprint("api", __name__)
 # Configure l'accès à l'API Gemini.
 # ⚠️ En production, utiliser une variable d'environnement :
 # export GEMINI_API_KEY="ta_cle"
-genai.configure(api_key=os.getenv("aze"))
-# Pour dev rapide :
-# genai.configure(api_key="TA_CLE_GEMINI_ICI")
+# 
+# # Pour dev rapide :
+genai.configure(api_key="AIzaSyA581wHjY1v3JCMcTH8kMLQnh23AQGCXs8")
 
 
 @api_bp.get("/health")
@@ -45,85 +45,79 @@ def list_cars():
     return jsonify(cars)
 
 
-@api_bp.post("/generate")
+import json
+import re
+
+@api_bp.route("/generate", methods=["POST"])
 def generate():
     """
-    Génère un texte via l'API Google Gemini.
+    Génère une description premium en sortie JSON stricte.
 
-    Body JSON attendu:
-        prompt (str, obligatoire):
-            Texte envoyé au modèle.
+    Body attendu:
+        {
+            "prompt": "...",
+            "temperature": 0.4
+        }
 
-        temperature (float, optionnel, défaut=0.7):
-            Contrôle la créativité du modèle.
-            - 0.0 → réponse très déterministe
-            - 0.3 → factuel / stable
-            - 0.7 → équilibré
-            - 1.0+ → créatif / plus aléatoire
-
-    Paramètres Gemini utilisés:
-        model_name (str):
-            "gemini-1.5-flash"
-            → Modèle rapide et gratuit (free tier)
-
-        generation_config (dict):
-            temperature (float):
-                Niveau d'aléatoire dans le choix des tokens.
-
-            top_p (float):
-                Nucleus sampling.
-                Le modèle choisit parmi les tokens
-                dont la probabilité cumulée atteint top_p.
-                1.0 = désactivé (considère tous les tokens).
-
-            top_k (int):
-                Limite le nombre de tokens candidats
-                parmi lesquels le modèle peut choisir.
-                Plus bas = plus déterministe.
-
-            max_output_tokens (int):
-                Longueur maximale de la réponse générée.
-
-    Returns:
-        JSON:
-            response (str): Texte généré par Gemini.
-
-    Errors:
-        400 si le prompt est absent.
-        500 en cas d'erreur API.
+    Retour:
+        {
+            "description": "..."
+        }
     """
 
     data = request.get_json()
 
-    prompt = data.get("prompt")
+    user_prompt = data.get("prompt")
     temperature = data.get("temperature", 0.7)
 
-    if not prompt:
+    if not user_prompt:
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-1.5-flash-latest",
             generation_config={
-                # Niveau de créativité / aléatoire
                 "temperature": temperature,
-
-                # Nucleus sampling : diversité contrôlée
                 "top_p": 1.0,
-
-                # Limite des candidats probables
                 "top_k": 40,
-
-                # Nombre maximum de tokens générés
                 "max_output_tokens": 512,
             }
         )
 
+        # 🔒 On force la réponse JSON
+        prompt = f"""
+        Réponds UNIQUEMENT en JSON valide.
+        Format attendu :
+
+        {{
+          "description": "string"
+        }}
+
+        Description demandée :
+        {user_prompt}
+        """
+
         response = model.generate_content(prompt)
 
-        return jsonify({
-            "response": response.text
-        })
+        raw_text = response.text.strip()
+
+        # 🧠 Nettoyage si le modèle entoure le JSON avec ```json
+        raw_text = re.sub(r"^```json", "", raw_text)
+        raw_text = re.sub(r"```$", "", raw_text).strip()
+
+        parsed = json.loads(raw_text)
+
+        return jsonify(parsed)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api_bp.get("/models")
+def list_models():
+    models = []
+    for m in genai.list_models():
+        models.append({
+            "name": m.name,
+            "supported_generation_methods": getattr(m, "supported_generation_methods", [])
+        })
+    return jsonify(models)
