@@ -45,69 +45,87 @@ def list_cars():
     return jsonify(cars)
 
 
-import json
-import re
-
-@api_bp.route("/generate", methods=["POST"])
+@api_bp.post("/generate")
 def generate():
     """
-    Génère une description premium en sortie JSON stricte.
+    Génère un texte via l'API Google Gemini.
 
-    Body attendu:
-        {
-            "prompt": "...",
-            "temperature": 0.4
-        }
+    Body JSON attendu:
+        prompt (str, obligatoire):
+            Texte envoyé au modèle.
 
-    Retour:
-        {
-            "description": "..."
-        }
+        temperature (float, optionnel, défaut=0.7):
+            Contrôle la créativité du modèle.
+            - 0.0 → réponse très déterministe
+            - 0.3 → factuel / stable
+            - 0.7 → équilibré
+            - 1.0+ → créatif / plus aléatoire
+
+    Paramètres Gemini utilisés:
+        model_name (str):
+            "gemini-1.5-flash"
+            → Modèle rapide et gratuit (free tier)
+
+        generation_config (dict):
+            temperature (float):
+                Niveau d'aléatoire dans le choix des tokens.
+
+            top_p (float):
+                Nucleus sampling.
+                Le modèle choisit parmi les tokens
+                dont la probabilité cumulée atteint top_p.
+                1.0 = désactivé (considère tous les tokens).
+
+            top_k (int):
+                Limite le nombre de tokens candidats
+                parmi lesquels le modèle peut choisir.
+                Plus bas = plus déterministe.
+
+            max_output_tokens (int):
+                Longueur maximale de la réponse générée.
+
+    Returns:
+        JSON:
+            response (str): Texte généré par Gemini.
+
+    Errors:
+        400 si le prompt est absent.
+        500 en cas d'erreur API.
     """
 
     data = request.get_json()
 
-    user_prompt = data.get("prompt")
+    prompt = data.get("prompt")
     temperature = data.get("temperature", 0.7)
 
-    if not user_prompt:
+    if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash-latest",
+            model_name="gemini-2.5-flash",
             generation_config={
+                # Niveau de créativité / aléatoire
                 "temperature": temperature,
+
+                # Nucleus sampling : diversité contrôlée
                 "top_p": 1.0,
+
+                # Limite des candidats probables
                 "top_k": 40,
+
+                # Nombre maximum de tokens générés
                 "max_output_tokens": 512,
             }
         )
 
-        # 🔒 On force la réponse JSON
-        prompt = f"""
-        Réponds UNIQUEMENT en JSON valide.
-        Format attendu :
-
-        {{
-          "description": "string"
-        }}
-
-        Description demandée :
-        {user_prompt}
-        """
-
         response = model.generate_content(prompt)
 
-        raw_text = response.text.strip()
+        print(response.text)
 
-        # 🧠 Nettoyage si le modèle entoure le JSON avec ```json
-        raw_text = re.sub(r"^```json", "", raw_text)
-        raw_text = re.sub(r"```$", "", raw_text).strip()
-
-        parsed = json.loads(raw_text)
-
-        return jsonify(parsed)
+        return jsonify({
+            "response": response.text
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
