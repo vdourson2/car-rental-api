@@ -23,7 +23,7 @@ api_bp = Blueprint("api", __name__)
 # export GEMINI_API_KEY="ta_cle"
 # 
 # # Pour dev rapide :
-genai.configure(api_key="AIzaSyA581wHjY1v3JCMcTH8kMLQnh23AQGCXs8")
+genai.configure(api_key="AIzaSyDlw-rcOCJ9FZ_uP37CjjoCjp3bLWhRZJg")
 
 client_service = ClientService(ClientRepository())
 vehicule_service = VehiculeService(VehiculeRepository())
