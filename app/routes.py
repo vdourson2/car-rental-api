@@ -273,9 +273,11 @@ def generate():
 
         print(response.text)
 
-        return jsonify({
+        json_response = jsonify({
             "response": response.text
         })
+
+        return json_response
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -283,6 +285,18 @@ def generate():
 
 @api_bp.get("/models")
 def list_models():
+    """Retrieve a list of available Gemini models.
+
+    This endpoint queries the Google Gemini API via ``genai.list_models()`` and
+    returns a JSON array where each element contains:
+        - ``name``: The model's identifier.
+        - ``supported_generation_methods``: A list of generation methods the model
+          supports (e.g., ``['generateContent']``). If the attribute is missing,
+          an empty list is used.
+
+    Returns:
+        Flask ``Response``: JSON response with the list of model descriptors.
+    """
     models = []
     for m in genai.list_models():
         models.append({
