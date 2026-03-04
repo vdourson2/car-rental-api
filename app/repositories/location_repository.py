@@ -23,7 +23,9 @@ class LocationRepository:
         db.session.delete(location)
         db.session.commit()
 
-    def has_overlapping_active_location(self, id_vehicule: int, date_debut: date, date_fin: date) -> bool:
+    def has_overlapping_active_location(
+        self, id_vehicule: int, date_debut: date, date_fin: date
+    ) -> bool:
         overlapping = (
             Location.query.filter(Location.id_vehicule == id_vehicule)
             .filter(Location.statut == "active")

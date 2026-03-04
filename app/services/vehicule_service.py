@@ -25,11 +25,15 @@ class VehiculeService:
         marque = (data.get("marque") or "").strip()
         modele = (data.get("modele") or "").strip()
         immatriculation = (data.get("immatriculation") or "").strip()
-        prix_par_jour = self._parse_positive_decimal(data.get("prix_par_jour"), "prix_par_jour")
+        prix_par_jour = self._parse_positive_decimal(
+            data.get("prix_par_jour"), "prix_par_jour"
+        )
         statut = (data.get("statut") or "disponible").strip().lower()
 
         if not marque or not modele or not immatriculation:
-            raise ValidationError("marque, modele et immatriculation sont obligatoires.")
+            raise ValidationError(
+                "marque, modele et immatriculation sont obligatoires."
+            )
         if statut not in ("disponible", "loue"):
             raise ValidationError("statut doit etre 'disponible' ou 'loue'.")
 
@@ -64,7 +68,9 @@ class VehiculeService:
                 raise ValidationError("immatriculation ne peut pas etre vide.")
             vehicule.immatriculation = immatriculation
         if "prix_par_jour" in data:
-            vehicule.prix_par_jour = self._parse_positive_decimal(data.get("prix_par_jour"), "prix_par_jour")
+            vehicule.prix_par_jour = self._parse_positive_decimal(
+                data.get("prix_par_jour"), "prix_par_jour"
+            )
         if "statut" in data:
             statut = (data.get("statut") or "").strip().lower()
             if statut not in ("disponible", "loue"):
@@ -86,7 +92,7 @@ class VehiculeService:
         try:
             parsed = Decimal(str(value))
         except (InvalidOperation, TypeError):
-            raise ValidationError(f"{field_name} doit etre un nombre valide.")
+            raise ValidationError(f"{field_name} doit etre un nombre valide.") from None
         if parsed <= 0:
             raise ValidationError(f"{field_name} doit etre superieur a 0.")
         return parsed.quantize(Decimal("0.01"))

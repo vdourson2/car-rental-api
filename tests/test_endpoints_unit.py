@@ -60,22 +60,40 @@ class EndpointsUnitTestCase(unittest.TestCase):
 
     def test_vehicles_endpoints(self):
         self.vehicule_service.list_vehicules.return_value = [
-            DummyEntity(id_vehicule=1, marque="Renault", modele="Clio", immatriculation="AA-123-AA", prix_par_jour=45.0, statut="disponible")
+            DummyEntity(
+                id_vehicule=1,
+                marque="Renault",
+                modele="Clio",
+                immatriculation="AA-123-AA",
+                prix_par_jour=45.0,
+                statut="disponible",
+            )
         ]
         self.vehicule_service.get_vehicule.return_value = DummyEntity(id_vehicule=1)
-        self.vehicule_service.create_vehicule.return_value = DummyEntity(id_vehicule=2, marque="Peugeot")
-        self.vehicule_service.update_vehicule.return_value = DummyEntity(id_vehicule=1, statut="loue")
+        self.vehicule_service.create_vehicule.return_value = DummyEntity(
+            id_vehicule=2, marque="Peugeot"
+        )
+        self.vehicule_service.update_vehicule.return_value = DummyEntity(
+            id_vehicule=1, statut="loue"
+        )
 
         self.assertEqual(self.client.get("/api/vehicles").status_code, 200)
         self.assertEqual(self.client.get("/api/vehicles/1").status_code, 200)
-        self.assertEqual(self.client.post("/api/vehicles", json={"marque": "Peugeot"}).status_code, 201)
-        self.assertEqual(self.client.put("/api/vehicles/1", json={"statut": "loue"}).status_code, 200)
+        self.assertEqual(
+            self.client.post("/api/vehicles", json={"marque": "Peugeot"}).status_code,
+            201,
+        )
+        self.assertEqual(
+            self.client.put("/api/vehicles/1", json={"statut": "loue"}).status_code, 200
+        )
         self.assertEqual(self.client.delete("/api/vehicles/1").status_code, 204)
         self.vehicule_service.delete_vehicule.assert_called_once_with(1)
 
     def test_legacy_cars_endpoint(self):
         self.vehicule_service.list_vehicules.return_value = [
-            DummyEntity(id_vehicule=8, marque="Toyota", modele="Yaris", statut="disponible"),
+            DummyEntity(
+                id_vehicule=8, marque="Toyota", modele="Yaris", statut="disponible"
+            ),
             DummyEntity(id_vehicule=9, marque="Ford", modele="Focus", statut="loue"),
         ]
         response = self.client.get("/api/cars")
@@ -89,32 +107,64 @@ class EndpointsUnitTestCase(unittest.TestCase):
         )
 
     def test_clients_endpoints(self):
-        self.client_service.list_clients.return_value = [DummyEntity(id_client=1, nom="Jean")]
-        self.client_service.get_client.return_value = DummyEntity(id_client=1, nom="Jean")
-        self.client_service.create_client.return_value = DummyEntity(id_client=2, nom="Marie")
-        self.client_service.update_client.return_value = DummyEntity(id_client=1, nom="Jean Maj")
+        self.client_service.list_clients.return_value = [
+            DummyEntity(id_client=1, nom="Jean")
+        ]
+        self.client_service.get_client.return_value = DummyEntity(
+            id_client=1, nom="Jean"
+        )
+        self.client_service.create_client.return_value = DummyEntity(
+            id_client=2, nom="Marie"
+        )
+        self.client_service.update_client.return_value = DummyEntity(
+            id_client=1, nom="Jean Maj"
+        )
 
         self.assertEqual(self.client.get("/api/clients").status_code, 200)
         self.assertEqual(self.client.get("/api/clients/1").status_code, 200)
-        self.assertEqual(self.client.post("/api/clients", json={"nom": "Marie"}).status_code, 201)
-        self.assertEqual(self.client.put("/api/clients/1", json={"nom": "Jean Maj"}).status_code, 200)
+        self.assertEqual(
+            self.client.post("/api/clients", json={"nom": "Marie"}).status_code, 201
+        )
+        self.assertEqual(
+            self.client.put("/api/clients/1", json={"nom": "Jean Maj"}).status_code, 200
+        )
         self.assertEqual(self.client.delete("/api/clients/1").status_code, 204)
         self.client_service.delete_client.assert_called_once_with(1)
 
     def test_users_and_login_endpoints(self):
-        self.utilisateur_service.list_utilisateurs.return_value = [DummyEntity(id_utilisateur=1, identifiant="admin")]
-        self.utilisateur_service.get_utilisateur.return_value = DummyEntity(id_utilisateur=1, identifiant="admin")
-        self.utilisateur_service.create_utilisateur.return_value = DummyEntity(id_utilisateur=2, identifiant="agent01")
-        self.utilisateur_service.update_utilisateur.return_value = DummyEntity(id_utilisateur=1, identifiant="admin2")
-        self.utilisateur_service.authenticate.return_value = DummyEntity(id_utilisateur=1, identifiant="admin")
+        self.utilisateur_service.list_utilisateurs.return_value = [
+            DummyEntity(id_utilisateur=1, identifiant="admin")
+        ]
+        self.utilisateur_service.get_utilisateur.return_value = DummyEntity(
+            id_utilisateur=1, identifiant="admin"
+        )
+        self.utilisateur_service.create_utilisateur.return_value = DummyEntity(
+            id_utilisateur=2, identifiant="agent01"
+        )
+        self.utilisateur_service.update_utilisateur.return_value = DummyEntity(
+            id_utilisateur=1, identifiant="admin2"
+        )
+        self.utilisateur_service.authenticate.return_value = DummyEntity(
+            id_utilisateur=1, identifiant="admin"
+        )
 
         self.assertEqual(self.client.get("/api/users").status_code, 200)
         self.assertEqual(self.client.get("/api/users/1").status_code, 200)
-        self.assertEqual(self.client.post("/api/users", json={"identifiant": "agent01", "mot_de_passe": "secret"}).status_code, 201)
-        self.assertEqual(self.client.put("/api/users/1", json={"identifiant": "admin2"}).status_code, 200)
+        self.assertEqual(
+            self.client.post(
+                "/api/users", json={"identifiant": "agent01", "mot_de_passe": "secret"}
+            ).status_code,
+            201,
+        )
+        self.assertEqual(
+            self.client.put("/api/users/1", json={"identifiant": "admin2"}).status_code,
+            200,
+        )
         self.assertEqual(self.client.delete("/api/users/1").status_code, 204)
 
-        login_response = self.client.post("/api/auth/login", json={"identifiant": "admin", "mot_de_passe": "secret"})
+        login_response = self.client.post(
+            "/api/auth/login", json={"identifiant": "admin", "mot_de_passe": "secret"}
+        )
         self.assertEqual(login_response.status_code, 200)
         self.assertIn("utilisateur", login_response.get_json())
 
@@ -122,14 +172,22 @@ class EndpointsUnitTestCase(unittest.TestCase):
         self.location_service.list_locations.return_value = [DummyEntity(id_location=1)]
         self.location_service.get_location.return_value = DummyEntity(id_location=1)
         self.location_service.create_location.return_value = DummyEntity(id_location=2)
-        self.location_service.close_location.return_value = DummyEntity(id_location=1, statut="terminee")
+        self.location_service.close_location.return_value = DummyEntity(
+            id_location=1, statut="terminee"
+        )
 
         self.assertEqual(self.client.get("/api/locations").status_code, 200)
         self.assertEqual(self.client.get("/api/locations/1").status_code, 200)
         self.assertEqual(
             self.client.post(
                 "/api/locations",
-                json={"date_debut": "2026-01-10", "date_fin": "2026-01-12", "id_client": 1, "id_vehicule": 1, "id_utilisateur": 1},
+                json={
+                    "date_debut": "2026-01-10",
+                    "date_fin": "2026-01-12",
+                    "id_client": 1,
+                    "id_vehicule": 1,
+                    "id_utilisateur": 1,
+                },
             ).status_code,
             201,
         )
@@ -146,7 +204,9 @@ class EndpointsUnitTestCase(unittest.TestCase):
                 return SimpleNamespace(text="Texte genere")
 
         with patch.object(self.routes.genai, "GenerativeModel", FakeModel):
-            response = self.client.post("/api/generate", json={"prompt": "Bonjour", "temperature": 0.2})
+            response = self.client.post(
+                "/api/generate", json={"prompt": "Bonjour", "temperature": 0.2}
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"response": "Texte genere"})
 
@@ -169,7 +229,10 @@ class EndpointsUnitTestCase(unittest.TestCase):
 
     def test_models_endpoint(self):
         fake_models = [
-            SimpleNamespace(name="models/gemini-2.5-flash", supported_generation_methods=["generateContent"]),
+            SimpleNamespace(
+                name="models/gemini-2.5-flash",
+                supported_generation_methods=["generateContent"],
+            ),
             SimpleNamespace(name="models/legacy"),
         ]
         with patch.object(self.routes.genai, "list_models", return_value=fake_models):
@@ -178,22 +241,31 @@ class EndpointsUnitTestCase(unittest.TestCase):
         self.assertEqual(
             response.get_json(),
             [
-                {"name": "models/gemini-2.5-flash", "supported_generation_methods": ["generateContent"]},
+                {
+                    "name": "models/gemini-2.5-flash",
+                    "supported_generation_methods": ["generateContent"],
+                },
                 {"name": "models/legacy", "supported_generation_methods": []},
             ],
         )
 
     def test_service_error_handler(self):
-        self.vehicule_service.get_vehicule.side_effect = NotFoundError("Vehicule introuvable.")
+        self.vehicule_service.get_vehicule.side_effect = NotFoundError(
+            "Vehicule introuvable."
+        )
         response = self.client.get("/api/vehicles/999")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.get_json(), {"error": "Vehicule introuvable."})
 
     def test_integrity_error_handler(self):
-        self.vehicule_service.create_vehicule.side_effect = IntegrityError("stmt", "params", Exception("db"))
+        self.vehicule_service.create_vehicule.side_effect = IntegrityError(
+            "stmt", "params", Exception("db")
+        )
         response = self.client.post("/api/vehicles", json={"marque": "X"})
         self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.get_json(), {"error": "Contrainte base de donnees violee."})
+        self.assertEqual(
+            response.get_json(), {"error": "Contrainte base de donnees violee."}
+        )
 
 
 if __name__ == "__main__":

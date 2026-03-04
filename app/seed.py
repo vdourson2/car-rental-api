@@ -29,9 +29,21 @@ def seed_database() -> dict[str, int]:
         inserted["utilisateurs"] += 1
 
     client_specs = [
-        {"nom": "Jean Dupont", "contact": "jean.dupont@example.com", "numero_permis": "DUPONT-001"},
-        {"nom": "Marie Lambert", "contact": "marie.lambert@example.com", "numero_permis": "LAMBERT-002"},
-        {"nom": "Olivier Martin", "contact": "olivier.martin@example.com", "numero_permis": "MARTIN-003"},
+        {
+            "nom": "Jean Dupont",
+            "contact": "jean.dupont@example.com",
+            "numero_permis": "DUPONT-001",
+        },
+        {
+            "nom": "Marie Lambert",
+            "contact": "marie.lambert@example.com",
+            "numero_permis": "LAMBERT-002",
+        },
+        {
+            "nom": "Olivier Martin",
+            "contact": "olivier.martin@example.com",
+            "numero_permis": "MARTIN-003",
+        },
     ]
     for spec in client_specs:
         existing = Client.query.filter_by(numero_permis=spec["numero_permis"]).first()
@@ -64,7 +76,9 @@ def seed_database() -> dict[str, int]:
         },
     ]
     for spec in vehicule_specs:
-        existing = Vehicule.query.filter_by(immatriculation=spec["immatriculation"]).first()
+        existing = Vehicule.query.filter_by(
+            immatriculation=spec["immatriculation"]
+        ).first()
         if existing:
             continue
         db.session.add(Vehicule(**spec))
@@ -94,21 +108,23 @@ def seed_database() -> dict[str, int]:
     ]
     for spec in location_specs:
         client = Client.query.filter_by(numero_permis=spec["client_permis"]).first()
-        vehicule = Vehicule.query.filter_by(immatriculation=spec["vehicule_immatriculation"]).first()
-        utilisateur = Utilisateur.query.filter_by(identifiant=spec["utilisateur_identifiant"]).first()
+        vehicule = Vehicule.query.filter_by(
+            immatriculation=spec["vehicule_immatriculation"]
+        ).first()
+        utilisateur = Utilisateur.query.filter_by(
+            identifiant=spec["utilisateur_identifiant"]
+        ).first()
 
         if not client or not vehicule or not utilisateur:
             continue
 
-        existing = (
-            Location.query.filter_by(
-                id_client=client.id_client,
-                id_vehicule=vehicule.id_vehicule,
-                id_utilisateur=utilisateur.id_utilisateur,
-                date_debut=spec["date_debut"],
-                date_fin=spec["date_fin"],
-            ).first()
-        )
+        existing = Location.query.filter_by(
+            id_client=client.id_client,
+            id_vehicule=vehicule.id_vehicule,
+            id_utilisateur=utilisateur.id_utilisateur,
+            date_debut=spec["date_debut"],
+            date_fin=spec["date_fin"],
+        ).first()
         if existing:
             continue
 
@@ -131,7 +147,11 @@ def seed_database() -> dict[str, int]:
 
 def register_seed_command(app: Flask) -> None:
     @app.cli.command("seed")
-    @click.option("--with-create", is_flag=True, help="Cree les tables depuis les modeles avant le seed.")
+    @click.option(
+        "--with-create",
+        is_flag=True,
+        help="Cree les tables depuis les modeles avant le seed.",
+    )
     def seed_command(with_create: bool) -> None:
         if with_create:
             db.create_all()

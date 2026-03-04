@@ -6,6 +6,7 @@ from .extensions import db, migrate
 from .openapi import build_openapi_spec
 from .seed import register_seed_command
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -16,6 +17,7 @@ def create_app():
 
     from . import models  # noqa: F401
     from .routes import api_bp
+
     app.register_blueprint(api_bp, url_prefix="/api")
     register_seed_command(app)
 

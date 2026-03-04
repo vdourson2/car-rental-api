@@ -12,7 +12,10 @@ def build_openapi_spec() -> dict:
             {"name": "Vehicules", "description": "Gestion du parc de vehicules"},
             {"name": "Clients", "description": "Gestion des clients"},
             {"name": "Utilisateurs", "description": "Gestion des utilisateurs"},
-            {"name": "Authentification", "description": "Login et verification d'identite"},
+            {
+                "name": "Authentification",
+                "description": "Login et verification d'identite",
+            },
             {"name": "Locations", "description": "Gestion des reservations/location"},
             {"name": "IA", "description": "Endpoints Gemini"},
         ],
@@ -45,13 +48,21 @@ def build_openapi_spec() -> dict:
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": ["marque", "modele", "immatriculation", "prix_par_jour"],
+                                    "required": [
+                                        "marque",
+                                        "modele",
+                                        "immatriculation",
+                                        "prix_par_jour",
+                                    ],
                                     "properties": {
                                         "marque": {"type": "string"},
                                         "modele": {"type": "string"},
                                         "immatriculation": {"type": "string"},
                                         "prix_par_jour": {"type": "number"},
-                                        "statut": {"type": "string", "enum": ["disponible", "loue"]},
+                                        "statut": {
+                                            "type": "string",
+                                            "enum": ["disponible", "loue"],
+                                        },
                                     },
                                 }
                             }
@@ -72,7 +83,10 @@ def build_openapi_spec() -> dict:
                             "schema": {"type": "integer"},
                         }
                     ],
-                    "responses": {"200": {"description": "Vehicule trouve"}, "404": {"description": "Introuvable"}},
+                    "responses": {
+                        "200": {"description": "Vehicule trouve"},
+                        "404": {"description": "Introuvable"},
+                    },
                 },
                 "put": {
                     "tags": ["Vehicules"],
@@ -96,7 +110,10 @@ def build_openapi_spec() -> dict:
                                         "modele": {"type": "string"},
                                         "immatriculation": {"type": "string"},
                                         "prix_par_jour": {"type": "number"},
-                                        "statut": {"type": "string", "enum": ["disponible", "loue"]},
+                                        "statut": {
+                                            "type": "string",
+                                            "enum": ["disponible", "loue"],
+                                        },
                                     },
                                 }
                             }
@@ -158,7 +175,10 @@ def build_openapi_spec() -> dict:
                             "schema": {"type": "integer"},
                         }
                     ],
-                    "responses": {"200": {"description": "Client trouve"}, "404": {"description": "Introuvable"}},
+                    "responses": {
+                        "200": {"description": "Client trouve"},
+                        "404": {"description": "Introuvable"},
+                    },
                 },
                 "put": {
                     "tags": ["Clients"],
@@ -230,7 +250,10 @@ def build_openapi_spec() -> dict:
                             "schema": {"type": "integer"},
                         }
                     ],
-                    "responses": {"200": {"description": "Utilisateur trouve"}, "404": {"description": "Introuvable"}},
+                    "responses": {
+                        "200": {"description": "Utilisateur trouve"},
+                        "404": {"description": "Introuvable"},
+                    },
                 },
                 "put": {
                     "tags": ["Utilisateurs"],
@@ -300,10 +323,22 @@ def build_openapi_spec() -> dict:
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": ["date_debut", "date_fin", "id_client", "id_vehicule", "id_utilisateur"],
+                                    "required": [
+                                        "date_debut",
+                                        "date_fin",
+                                        "id_client",
+                                        "id_vehicule",
+                                        "id_utilisateur",
+                                    ],
                                     "properties": {
-                                        "date_debut": {"type": "string", "format": "date"},
-                                        "date_fin": {"type": "string", "format": "date"},
+                                        "date_debut": {
+                                            "type": "string",
+                                            "format": "date",
+                                        },
+                                        "date_fin": {
+                                            "type": "string",
+                                            "format": "date",
+                                        },
                                         "id_client": {"type": "integer"},
                                         "id_vehicule": {"type": "integer"},
                                         "id_utilisateur": {"type": "integer"},
@@ -327,7 +362,10 @@ def build_openapi_spec() -> dict:
                             "schema": {"type": "integer"},
                         }
                     ],
-                    "responses": {"200": {"description": "Location trouvee"}, "404": {"description": "Introuvable"}},
+                    "responses": {
+                        "200": {"description": "Location trouvee"},
+                        "404": {"description": "Introuvable"},
+                    },
                 },
                 "delete": {
                     "tags": ["Locations"],
@@ -378,7 +416,10 @@ def build_openapi_spec() -> dict:
                                     "required": ["prompt"],
                                     "properties": {
                                         "prompt": {"type": "string"},
-                                        "temperature": {"type": "number", "default": 0.7},
+                                        "temperature": {
+                                            "type": "number",
+                                            "default": 0.7,
+                                        },
                                     },
                                 }
                             }

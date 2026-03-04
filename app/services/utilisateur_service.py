@@ -4,7 +4,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.models import Utilisateur
 from app.repositories import UtilisateurRepository
 
-from .exceptions import AuthenticationError, ConflictError, NotFoundError, ValidationError
+from .exceptions import (
+    AuthenticationError,
+    ConflictError,
+    NotFoundError,
+    ValidationError,
+)
 
 
 class UtilisateurService:
@@ -67,7 +72,9 @@ class UtilisateurService:
             raise ValidationError("identifiant et mot_de_passe sont obligatoires.")
 
         utilisateur = self.repository.get_by_identifiant(identifiant)
-        if not utilisateur or not check_password_hash(utilisateur.mot_de_passe, mot_de_passe):
+        if not utilisateur or not check_password_hash(
+            utilisateur.mot_de_passe, mot_de_passe
+        ):
             raise AuthenticationError("Identifiants invalides.")
 
         return utilisateur
