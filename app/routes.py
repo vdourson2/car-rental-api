@@ -20,7 +20,7 @@ api_bp = Blueprint("api", __name__)
 # -------------------------------------------------------------------
 # Configure l'accès à l'API Gemini.
 # ⚠️ En production, utiliser une variable d'environnement :
-# export GEMINI_API_KEY="ta_cle"
+# export GEMINI_API_KEY="TACLE"
 # 
 # # Pour dev rapide :
 genai.configure(api_key="AIzaSyDlw-rcOCJ9FZ_uP37CjjoCjp3bLWhRZJg")
