@@ -2,7 +2,12 @@ from datetime import datetime
 
 from app.extensions import db
 from app.models import Location
-from app.repositories import ClientRepository, LocationRepository, UtilisateurRepository, VehiculeRepository
+from app.repositories import (
+    ClientRepository,
+    LocationRepository,
+    UtilisateurRepository,
+    VehiculeRepository,
+)
 
 from .exceptions import ConflictError, NotFoundError, ValidationError
 
@@ -37,7 +42,9 @@ class LocationService:
         date_fin = self._parse_date(data.get("date_fin"), "date_fin")
 
         if date_fin < date_debut:
-            raise ValidationError("date_fin doit etre superieure ou egale a date_debut.")
+            raise ValidationError(
+                "date_fin doit etre superieure ou egale a date_debut."
+            )
 
         client = self.client_repository.get_by_id(id_client)
         if not client:
@@ -54,7 +61,9 @@ class LocationService:
         if vehicule.statut != "disponible":
             raise ConflictError("Vehicule deja loue.")
 
-        if self.location_repository.has_overlapping_active_location(vehicule.id_vehicule, date_debut, date_fin):
+        if self.location_repository.has_overlapping_active_location(
+            vehicule.id_vehicule, date_debut, date_fin
+        ):
             raise ConflictError("Vehicule indisponible sur cet intervalle.")
 
         location = Location(
@@ -95,4 +104,6 @@ class LocationService:
         try:
             return datetime.strptime(str(raw_date), "%Y-%m-%d").date()
         except ValueError:
-            raise ValidationError(f"{field_name} doit etre au format YYYY-MM-DD.")
+            raise ValidationError(
+                f"{field_name} doit etre au format YYYY-MM-DD."
+            ) from None

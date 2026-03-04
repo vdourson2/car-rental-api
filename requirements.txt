@@ -12,3 +12,5 @@ flask-cors
 google-generativeai
 psycopg[binary]==3.2.10
 gunicorn>=22.0.0
+ruff==0.15.4
+pre-commit==4.5.1

@@ -4,7 +4,12 @@ import google.generativeai as genai
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
-from app.repositories import ClientRepository, LocationRepository, UtilisateurRepository, VehiculeRepository
+from app.repositories import (
+    ClientRepository,
+    LocationRepository,
+    UtilisateurRepository,
+    VehiculeRepository,
+)
 from app.services import (
     ClientService,
     LocationService,
@@ -21,7 +26,7 @@ api_bp = Blueprint("api", __name__)
 # Configure l'accès à l'API Gemini.
 # ⚠️ En production, utiliser une variable d'environnement :
 # export GEMINI_API_KEY="ta_cle"
-# 
+#
 # # Pour dev rapide :
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -164,12 +169,16 @@ def delete_user(utilisateur_id: int):
 def login():
     payload = request.get_json(silent=True) or {}
     user = utilisateur_service.authenticate(payload)
-    return jsonify({"message": "Authentification reussie.", "utilisateur": user.to_dict()})
+    return jsonify(
+        {"message": "Authentification reussie.", "utilisateur": user.to_dict()}
+    )
 
 
 @api_bp.get("/locations")
 def list_locations():
-    return jsonify([location.to_dict() for location in location_service.list_locations()])
+    return jsonify(
+        [location.to_dict() for location in location_service.list_locations()]
+    )
 
 
 @api_bp.get("/locations/<int:location_id>")
@@ -195,6 +204,7 @@ def close_location(location_id: int):
 def delete_location(location_id: int):
     location_service.delete_location(location_id)
     return "", 204
+
 
 @api_bp.post("/generate")
 def generate():
@@ -258,13 +268,10 @@ def generate():
             generation_config={
                 # Niveau de créativité / aléatoire
                 "temperature": temperature,
-
                 # Nucleus sampling : diversité contrôlée
                 "top_p": 1.0,
-
                 # Limite des candidats probables
                 "top_k": 40,
-
                 # Nombre maximum de tokens générés
                 "max_output_tokens": 512,
             },
@@ -274,9 +281,7 @@ def generate():
 
         print(response.text)
 
-        json_response = jsonify({
-            "response": response.text
-        })
+        json_response = jsonify({"response": response.text})
 
         return json_response
 
@@ -300,8 +305,12 @@ def list_models():
     """
     models = []
     for m in genai.list_models():
-        models.append({
-            "name": m.name,
-            "supported_generation_methods": getattr(m, "supported_generation_methods", [])
-        })
+        models.append(
+            {
+                "name": m.name,
+                "supported_generation_methods": getattr(
+                    m, "supported_generation_methods", []
+                ),
+            }
+        )
     return jsonify(models)

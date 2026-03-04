@@ -53,7 +53,9 @@ class Vehicule(db.Model):
     modele = db.Column(db.String(50), nullable=False)
     immatriculation = db.Column(db.String(20), nullable=False, unique=True)
     prix_par_jour = db.Column(db.Numeric(10, 2), nullable=False)
-    statut = db.Column(db.String(20), nullable=False, default="disponible", server_default="disponible")
+    statut = db.Column(
+        db.String(20), nullable=False, default="disponible", server_default="disponible"
+    )
 
     locations = db.relationship("Location", back_populates="vehicule")
 
@@ -82,8 +84,12 @@ class Location(db.Model):
     id_location = db.Column(db.Integer, primary_key=True)
     date_debut = db.Column(db.Date, nullable=False)
     date_fin = db.Column(db.Date, nullable=False)
-    prix_total = db.Column(db.Numeric(10, 2), nullable=False, default=Decimal("0.00"), server_default="0")
-    statut = db.Column(db.String(20), nullable=False, default="active", server_default="active")
+    prix_total = db.Column(
+        db.Numeric(10, 2), nullable=False, default=Decimal("0.00"), server_default="0"
+    )
+    statut = db.Column(
+        db.String(20), nullable=False, default="active", server_default="active"
+    )
 
     id_client = db.Column(
         db.Integer,
@@ -111,7 +117,9 @@ class Location(db.Model):
         if not self.date_debut or not self.date_fin:
             raise ValueError("Les dates de debut et fin sont requises.")
         if self.date_fin < self.date_debut:
-            raise ValueError("La date de fin doit etre superieure ou egale a la date de debut.")
+            raise ValueError(
+                "La date de fin doit etre superieure ou egale a la date de debut."
+            )
 
         nb_jours = max((self.date_fin - self.date_debut).days, 0) + 1
         prix = Decimal(str(self.vehicule.prix_par_jour)) * Decimal(nb_jours)
